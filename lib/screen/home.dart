@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services),
+            icon: Icon(Icons.camera),
             label: 'Diagnosis',
           ),
           BottomNavigationBarItem(

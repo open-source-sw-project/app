@@ -4,7 +4,6 @@ import 'screen/sign_up.dart';
 import 'screen/set_up_profile.dart';
 import 'screen/home.dart';
 import 'screen/loading_screen.dart';
-import 'screen/past_logs.dart';
 import 'screen/profile.dart';
 
 void main() {
@@ -26,7 +25,6 @@ class MyApp extends StatelessWidget {
         '/setUpProfile': (context) =>
             const SetUpProfileScreen(), // 회원가입 두 번째 화면
         '/loading': (context) => const LoadingScreen(),
-//        '/logs' : (context) => const LogScreen(),
         '/profile': (context) => const ProfileScreen(),
       },
     );
