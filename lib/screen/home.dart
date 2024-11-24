@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'diagnosis.dart'; // Diagnosis 화면
+import 'profile.dart'; // Profile 화면
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,11 +12,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0; // 현재 선택된 하단 탭의 인덱스
 
-  // 화면 리스트 (나머지 화면은 연결할 때 교체)
+  // 화면 리스트 (Diagnosis와 Profile 화면 연결)
   final List<Widget> _screens = [
     const HomeContent(), // Home 콘텐츠
-    const PlaceholderScreen(label: 'Diagnosis'), // Diagnosis Screen Placeholder
-    const PlaceholderScreen(label: 'Profile'), // Profile Screen Placeholder
+    const DiagnosisScreen(), // Diagnosis 화면
+    const ProfileScreen(), // Profile 화면
   ];
 
   @override
@@ -87,27 +89,6 @@ class HomeContent extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// 임시 Placeholder 화면 (Diagnosis, Profile 교체 가능)
-class PlaceholderScreen extends StatelessWidget {
-  final String label;
-
-  const PlaceholderScreen({super.key, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '$label Screen',
-        style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Colors.blueAccent,
-        ),
       ),
     );
   }

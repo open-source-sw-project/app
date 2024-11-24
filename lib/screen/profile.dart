@@ -68,7 +68,8 @@ class ProfileScreen extends StatelessWidget {
               future: ApiService.fetchLogs(), // API 호출
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator()); // 로딩 표시
+                  return const Center(
+                      child: CircularProgressIndicator()); // 로딩 표시
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text('Error: ${snapshot.error}'), // 에러 메시지

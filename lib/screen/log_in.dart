@@ -100,6 +100,7 @@ class LogInScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Handle Sign In
+                    Navigator.pushNamed(context, '/home');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,

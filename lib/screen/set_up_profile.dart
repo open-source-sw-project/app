@@ -21,20 +21,6 @@ class SetUpProfileScreen extends StatelessWidget {
             Navigator.pop(context); // 이전 화면으로 이동
           },
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Center(
-              child: Text(
-                '1/2',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -87,8 +73,8 @@ class SetUpProfileScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
                     ),
-                    prefixIcon:
-                        const Icon(Icons.person_outline, color: Colors.blueAccent),
+                    prefixIcon: const Icon(Icons.person_outline,
+                        color: Colors.blueAccent),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -100,8 +86,8 @@ class SetUpProfileScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
                     ),
-                    prefixIcon:
-                        const Icon(Icons.person_outline, color: Colors.blueAccent),
+                    prefixIcon: const Icon(Icons.person_outline,
+                        color: Colors.blueAccent),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -114,8 +100,8 @@ class SetUpProfileScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
                     ),
-                    prefixIcon:
-                        const Icon(Icons.phone_outlined, color: Colors.blueAccent),
+                    prefixIcon: const Icon(Icons.phone_outlined,
+                        color: Colors.blueAccent),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -127,8 +113,8 @@ class SetUpProfileScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
                     ),
-                    prefixIcon:
-                        const Icon(Icons.calendar_today_outlined, color: Colors.blueAccent),
+                    prefixIcon: const Icon(Icons.calendar_today_outlined,
+                        color: Colors.blueAccent),
                   ),
                   readOnly: true,
                   onTap: () async {
