@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/services/profile_service.dart'; // API 호출 파일 가져오기
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 30),
-            Center(
+            const Center(
               child: Column(
                 children: [
                   CircleAvatar(
@@ -21,8 +21,8 @@ class ProfileScreen extends StatelessWidget {
                       'https://via.placeholder.com/150',
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
+                  SizedBox(height: 10),
+                  Text(
                     'Ruchita',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),

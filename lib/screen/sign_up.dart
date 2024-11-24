@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class SignUpScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 30),
               // App Logo and Title
-              Center(
+              const Center(
                 child: Text(
                   'HanDoc.',
                   style: TextStyle(
@@ -31,7 +31,7 @@ class SignUpScreen extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       'Sign Up',
                       style: TextStyle(
                         fontSize: 24,

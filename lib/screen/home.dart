@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Home 화면의 메인 콘텐츠
 class HomeContent extends StatelessWidget {
-  const HomeContent({Key? key}) : super(key: key);
+  const HomeContent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class HomeContent extends StatelessWidget {
 class PlaceholderScreen extends StatelessWidget {
   final String label;
 
-  const PlaceholderScreen({Key? key, required this.label}) : super(key: key);
+  const PlaceholderScreen({super.key, required this.label});
 
   @override
   Widget build(BuildContext context) {

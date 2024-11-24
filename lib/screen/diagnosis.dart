@@ -4,7 +4,7 @@ import 'dart:io';
 
 class DiagnosisScreen extends StatefulWidget {
   final File? image; // 이전 화면에서 찍은 이미지를 전달받음
-  const DiagnosisScreen({Key? key, this.image}) : super(key: key);
+  const DiagnosisScreen({super.key, this.image});
 
   @override
   State<DiagnosisScreen> createState() => _DiagnosisScreenState();

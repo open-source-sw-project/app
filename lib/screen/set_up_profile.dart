@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SetUpProfileScreen extends StatelessWidget {
-  const SetUpProfileScreen({Key? key}) : super(key: key);
+  const SetUpProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +21,9 @@ class SetUpProfileScreen extends StatelessWidget {
             Navigator.pop(context); // 이전 화면으로 이동
           },
         ),
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
             child: Center(
               child: Text(
                 '1/2',
@@ -47,7 +47,7 @@ class SetUpProfileScreen extends StatelessWidget {
                 Center(
                   child: Stack(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         radius: 50,
                         backgroundImage: NetworkImage(
                             'https://via.placeholder.com/150'), // 기본 이미지

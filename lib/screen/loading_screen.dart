@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({Key? key}) : super(key: key);
+  const LoadingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
+      body: const SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -20,11 +20,11 @@ class LoadingScreen extends StatelessWidget {
                   height: 100,
                   child: CircularProgressIndicator(
                     valueColor:
-                        const AlwaysStoppedAnimation<Color>(Colors.redAccent),
+                        AlwaysStoppedAnimation<Color>(Colors.redAccent),
                     strokeWidth: 8,
                   ),
                 ),
-                const Text(
+                Text(
                   'LOADING...',
                   style: TextStyle(
                     fontSize: 16,

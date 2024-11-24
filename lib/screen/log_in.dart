@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LogInScreen extends StatelessWidget {
-  const LogInScreen({Key? key}) : super(key: key);
+  const LogInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class LogInScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 30),
               // App Logo and Title
-              Center(
+              const Center(
                 child: Text(
                   'HanDoc.',
                   style: TextStyle(
@@ -31,7 +31,7 @@ class LogInScreen extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       'Welcome back',
                       style: TextStyle(
                         fontSize: 24,
@@ -86,7 +86,7 @@ class LogInScreen extends StatelessWidget {
                   onPressed: () {
                     // Handle Forgot Password
                   },
-                  child: Text(
+                  child: const Text(
                     'Forgot Password',
                     style: TextStyle(color: Colors.blueAccent),
                   ),
@@ -128,7 +128,7 @@ class LogInScreen extends StatelessWidget {
                         // Handle Sign Up
                         Navigator.pushNamed(context, '/signUp');
                       },
-                      child: Text(
+                      child: const Text(
                         'Sign Up',
                         style: TextStyle(
                           color: Colors.blueAccent,
