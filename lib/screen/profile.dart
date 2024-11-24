@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/services/profile_service.dart'; // API 호출 파일 가져오기
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -10,112 +11,110 @@ class ProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            // 프로필 사진 및 이름
+            const SizedBox(height: 30),
             Center(
               child: Column(
                 children: [
-                  // 프로필 이미지
                   CircleAvatar(
                     radius: 50,
                     backgroundImage: NetworkImage(
-                      'https://via.placeholder.com/150', // 기본 프로필 이미지 URL
+                      'https://via.placeholder.com/150',
                     ),
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'Ruchita', // 사용자 이름
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                    'Ruchita',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 30),
-            // 옵션 리스트
-            Expanded(
-              child: ListView(
-                children: [
-                  // My Previous Log 버튼
-                  ListTile(
-                    leading: const Icon(
-                      Icons.history,
-                      color: Colors.blueAccent,
-                    ),
-                    title: const Text('My previous log'),
-                    trailing:
-                        const Icon(Icons.arrow_forward_ios, color: Colors.grey),
-                    onTap: () {
-                      // 로그 화면으로 이동하는 로직
-                      Navigator.pushNamed(context, '/logs');
-                    },
-                  ),
-                  const Divider(),
-                  // 로그아웃 버튼
-                  ListTile(
-                    leading: const Icon(
-                      Icons.logout,
-                      color: Colors.redAccent,
-                    ),
-                    title: const Text('Logout'),
-                    trailing:
-                        const Icon(Icons.arrow_forward_ios, color: Colors.grey),
-                    onTap: () {
-                      _showLogoutDialog(context); // 로그아웃 확인 다이얼로그
-                    },
-                  ),
-                ],
-              ),
+            const SizedBox(height: 40),
+            // My previous log 버튼
+            ListTile(
+              leading: const Icon(Icons.article, color: Colors.blueAccent),
+              title: const Text('My previous log'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                _showLogsDialog(context); // 팝업 표시
+              },
+            ),
+            const Divider(),
+            // Logout 버튼
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text('Logout'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                _logout(context);
+              },
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // 다른 기능 추가 가능 (예: 프로필 사진 변경)
-        },
-        backgroundColor: Colors.white,
-        child: const CircleAvatar(
-          radius: 25,
-          backgroundImage: NetworkImage(
-            'https://via.placeholder.com/100', // 서브 이미지
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2, // Profile 탭 활성화
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/home'); // Home으로 이동
-          } else if (index == 1) {
-            Navigator.pushNamed(context, '/diagnosis'); // Diagnosis로 이동
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services),
-            label: 'Diagnosis',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
-      ),
     );
   }
 
-  // 로그아웃 확인 다이얼로그
-  void _showLogoutDialog(BuildContext context) {
+  // 로그 팝업 표시
+  void _showLogsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Previous Logs'),
+          content: SizedBox(
+            height: 300,
+            child: FutureBuilder<List<Log>>(
+              future: ApiService.fetchLogs(), // API 호출
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator()); // 로딩 표시
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'), // 에러 메시지
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No logs available'));
+                } else {
+                  // 데이터가 있을 경우 리스트 표시
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final log = snapshot.data![index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(log.imageUrl), // 이미지 표시
+                        ),
+                        title: Text(log.date), // 날짜 표시
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // 팝업 닫기
+              },
+              child: const Text('Close'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // 팝업 닫기
+                Navigator.pushNamed(context, '/logs'); // 전체 로그 페이지로 이동
+              },
+              child: const Text('See all logs'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 로그아웃 로직
+  void _logout(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -124,21 +123,18 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // 다이얼로그 닫기
+              Navigator.pop(context);
             },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/login', // 로그아웃 후 로그인 화면으로 이동
-                (route) => false,
-              );
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/login');
             },
             child: const Text(
               'Logout',
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: Colors.redAccent),
             ),
           ),
         ],
