@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LogInScreen extends StatelessWidget {
-  const LogInScreen({Key? key}) : super(key: key);
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +27,12 @@ class LogInScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // Welcome Back Text
+              // Sign Up Text
               Center(
                 child: Column(
                   children: [
                     Text(
-                      'Welcome back',
+                      'Sign Up',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
@@ -41,7 +41,7 @@ class LogInScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Please enter your email id or password\nto Sign In',
+                      'Please enter your Email ID to Sign Up.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -65,11 +65,11 @@ class LogInScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // Password TextField
+              // New Password TextField
               TextField(
                 obscureText: true,
                 decoration: InputDecoration(
-                  labelText: 'Password',
+                  labelText: 'New Password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blueAccent),
@@ -78,28 +78,15 @@ class LogInScreen extends StatelessWidget {
                       const Icon(Icons.lock_outline, color: Colors.blueAccent),
                 ),
               ),
-              const SizedBox(height: 10),
-              // Forgot Password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    // Handle Forgot Password
-                  },
-                  child: Text(
-                    'Forgot Password',
-                    style: TextStyle(color: Colors.blueAccent),
-                  ),
-                ),
-              ),
               const SizedBox(height: 30),
-              // Sign In Button
+              // Next Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {i
-                    // Handle Sign In
+                  onPressed: () {
+                    // Handle Next
+                     Navigator.pushNamed(context, '/setUpProfile');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
@@ -108,37 +95,11 @@ class LogInScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Sign In',
+                    'Next',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
-              const Spacer(),
-              // Sign Up Option
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don’t have an account? ",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Handle Sign Up
-                      },
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: Colors.blueAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
