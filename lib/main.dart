@@ -5,6 +5,7 @@ import 'screen/set_up_profile.dart';
 import 'screen/home.dart';
 import 'screen/loading_screen.dart';
 import 'screen/profile.dart';
+import 'screen/camera_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
             const SetUpProfileScreen(), // 회원가입 두 번째 화면
         '/loading': (context) => const LoadingScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/camera': (context) => const CameraScreen(),
       },
     );
   }
