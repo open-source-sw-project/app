@@ -90,7 +90,7 @@ $ git merge develop
   $ git push origin v1.0.0
 
 
-
+---
 ### 브랜치 네이밍 규칙
 + main: 최종 릴리스 브랜치.
 + ㄴ develop: 통합 개발 브랜치.
@@ -112,17 +112,17 @@ $ git merge develop
 ### 정기 병합:
 + 팀원 간 충돌을 줄이기 위해 매일 정해진 시간에 develop 브랜치와 자신의 브랜치를 동기화합니다.
 
-
-### 참고 명령어
-#### 현재 브랜치 확인:
+---
+## 참고 명령어
+### 현재 브랜치 확인:
   $ git branch
 
 
-#### 원격 브랜치 목록 확인:
+### 원격 브랜치 목록 확인:
   $ git branch -r
 
 
-#### 브랜치 삭제 (병합 후):
+### 브랜치 삭제 (병합 후):
   $ git branch -d <branch_name>
 
   $ git push origin --delete <branch_name>
