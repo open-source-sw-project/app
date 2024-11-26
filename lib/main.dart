@@ -5,13 +5,10 @@ import 'screen/set_up_profile.dart';
 import 'screen/home.dart';
 import 'screen/loading_screen.dart';
 import 'screen/profile.dart';
-<<<<<<< Updated upstream
 import 'screen/camera_screen.dart';
-=======
 import 'screen/forgot_password.dart';
 import 'screen/check_name_number.dart';
 import 'screen/reset_password_screen.dart';
->>>>>>> Stashed changes
 
 void main() {
   runApp(const MyApp());
@@ -33,13 +30,10 @@ class MyApp extends StatelessWidget {
             const SetUpProfileScreen(), // 회원가입 두 번째 화면
         '/loading': (context) => const LoadingScreen(),
         '/profile': (context) => const ProfileScreen(),
-<<<<<<< Updated upstream
         '/camera': (context) => const CameraScreen(),
-=======
         '/forgotPassword': (context) => const ForgotPasswordScreen(),
         '/checkIdentity': (context) => const CheckNameNumber(),
         '/resetPassword': (context) => const ResetPasswordScreen(),
->>>>>>> Stashed changes
       },
     );
   }
