@@ -16,7 +16,8 @@ repository for app
 
 ### joon, bell, jins:
 + 각자 작업하는 브랜치입니다. 이름은 팀원별로 구분됩니다. 작업이 완료되면 develop 브랜치로 병합합니다.
-
++ 
+---
 ### 브랜치 네이밍 규칙
    main: 최종 릴리스 브랜치.
    ㄴ develop: 통합 개발 브랜치.
