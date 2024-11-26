@@ -1,20 +1,3 @@
-# myapp
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
 
 ## Firebase 추가됨
 
@@ -24,7 +7,7 @@ auth는 회원가입에대해 당담함 여러가지의 회원가입형태를 �
 firestore는 데이터베이스로 NoSql방식을 사용하고있음 사용자 정보나 이미지url같은 텍스트로 정의되는 정보를 저장함
 storage는 이미지나 비디오같은 용량이크고 텍스트로 저장할수없는 파일을 저장함 firestore에서 이미지url정보를 이용해 해당 이미지를 불러올수있음
 
-
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 sign_up.dart, set_up_profile.dart   -->    회원가입기능 추가됨
 
