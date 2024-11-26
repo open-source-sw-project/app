@@ -68,7 +68,7 @@ $ git checkout joon
 
 $ git merge develop
 
-
+---
 ## 최종 릴리스
 ### 1. main으로 병합
 + develop 브랜치에서 릴리스 준비가 완료되면 main 브랜치로 병합합니다.
