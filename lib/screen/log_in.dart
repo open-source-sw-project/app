@@ -29,8 +29,8 @@ class LogInScreen extends StatelessWidget {
               const SizedBox(height: 20),
               // Welcome Back Text
               Center(
-                child: Column(
-                  children: [
+                    child: Column(
+                    children: [
                     const Text(
                       'Welcome back',
                       style: TextStyle(
@@ -41,7 +41,7 @@ class LogInScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Please enter your email id or password\nto Sign In',
+                      '로그인에 필요한 아이디와 비밀번호를 입력하세요\n',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -93,25 +93,28 @@ class LogInScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
               // Sign In Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle Sign In
-                    Navigator.pushNamed(context, '/home');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle Sign In
+                      Navigator.pushNamed(context, '/home');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    child: const Text(
+                      '로그인',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
               ),

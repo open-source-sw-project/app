@@ -11,7 +11,7 @@ class SetUpProfileScreen extends StatelessWidget {
         backgroundColor: Colors.blueAccent,
         elevation: 0,
         title: const Text(
-          'Set Up Profile',
+          '개인정보 설정',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -61,14 +61,14 @@ class SetUpProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Profile Picture',
+                  '프로필 사진',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 30),
                 // First Name
                 TextField(
                   decoration: InputDecoration(
-                    labelText: 'First Name',
+                    labelText: '이름',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -81,7 +81,7 @@ class SetUpProfileScreen extends StatelessWidget {
                 // Last Name
                 TextField(
                   decoration: InputDecoration(
-                    labelText: 'Last Name',
+                    labelText: '성',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -95,7 +95,7 @@ class SetUpProfileScreen extends StatelessWidget {
                 TextField(
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: 'Mobile Number',
+                    labelText: '전화번호',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -108,7 +108,7 @@ class SetUpProfileScreen extends StatelessWidget {
                 // Date of Birth
                 TextField(
                   decoration: InputDecoration(
-                    labelText: 'Date of Birth',
+                    labelText: '생년월일',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -138,6 +138,7 @@ class SetUpProfileScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle Sign Up Completion
+                      Navigator.pushNamed(context, '/login');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
@@ -146,7 +147,7 @@ class SetUpProfileScreen extends StatelessWidget {
                       ),
                     ),
                     child: const Text(
-                      'Sign Up',
+                      '가입하기',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
