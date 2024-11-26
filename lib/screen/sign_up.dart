@@ -1,7 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  bool _isLoading = false;
+
+  
+  // 회원가입 로직
+  Future<void> _signUp() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Firebase Auth를 사용해 회원가입
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      // 회원가입 성공 시 Firestore에 사용자 정보 저장
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'email': _emailController.text,
+        'createdAt': Timestamp.now(),
+      });
+      // 회원가입 성공 시 프로필 설정 화면으로 이동
+      if (mounted) {
+        Navigator.pushNamed(context, '/setUpProfile');
+      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Sign up failed')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +66,6 @@ class SignUpScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 30),
-              // App Logo and Title
               const Center(
                 child: Text(
                   'HanDoc.',
@@ -27,7 +78,6 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // Sign Up Text
               Center(
                 child: Column(
                   children: [
@@ -52,21 +102,20 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-              // Email TextField
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email ID',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blueAccent),
                   ),
-                  prefixIcon: const Icon(Icons.email_outlined,
-                      color: Colors.blueAccent),
+                  prefixIcon: const Icon(Icons.email_outlined, color: Colors.blueAccent),
                 ),
               ),
               const SizedBox(height: 20),
-              // New Password TextField
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'New Password',
@@ -74,30 +123,27 @@ class SignUpScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blueAccent),
                   ),
-                  prefixIcon:
-                      const Icon(Icons.lock_outline, color: Colors.blueAccent),
+                  prefixIcon: const Icon(Icons.lock_outline, color: Colors.blueAccent),
                 ),
               ),
               const SizedBox(height: 30),
-              // Next Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle Next
-                     Navigator.pushNamed(context, '/setUpProfile');
-                  },
+                  onPressed: _isLoading ? null : _signUp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Next',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'Next',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                 ),
               ),
             ],
@@ -105,5 +151,12 @@ class SignUpScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
