@@ -3,8 +3,8 @@ repository for app
 
 ---
 ## Git Workflow Strategy
-  +Branch Overview
-  +우리 프로젝트는 다음과 같은 브랜치 구조를 사용합니다:
++ Branch Overview
++ 우리 프로젝트는 다음과 같은 브랜치 구조를 사용합니다:
 
 
 ### main:
