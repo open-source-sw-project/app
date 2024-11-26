@@ -64,9 +64,9 @@ repository for app
 ### 2. 작업 브랜치에 반영
 + develop 브랜치의 변경사항을 자신의 브랜치에 반영합니다.
 
-$ git checkout joon
+  $ git checkout joon
 
-$ git merge develop
+  $ git merge develop
 
 ---
 ## 최종 릴리스
