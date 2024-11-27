@@ -32,16 +32,16 @@ class SignUpScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const Text(
-                      'Sign Up',
+                      '회원가입',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Colors.indigo,
                       ),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Please enter your Email ID to Sign Up.',
+                      '아이디로 사용할 이메일과 비밀번호를 입력하세요',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,

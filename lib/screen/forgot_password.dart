@@ -21,61 +21,79 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Forgot Password'),
-        backgroundColor: Colors.blueAccent,
-      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
-              const Center(
-                child: Text(
-                  'Recover Your Password',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
-                  ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 30),
+                    // App Logo
+                    const Center(
+                      child: Text(
+                        'HanDoc.',
+                        style: TextStyle(
+                          fontFamily: 'Cursive',
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Fine Email Text
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '계정 찾기',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          '아이디로 사용한 이메일을 입력하세요\n',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email ID',
+                        errorText: emailError,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                          const BorderSide(color: Colors.blueAccent),
+                        ),
+                        prefixIcon: const Icon(Icons.email_outlined,
+                            color: Colors.blueAccent),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email ID',
-                  errorText: emailError,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.blueAccent),
-                  ),
-                  prefixIcon:
-                  const Icon(Icons.email_outlined, color: Colors.blueAccent),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
                     final email = emailController.text.trim();
-                    // Handle Check Name And PhoneNumber
                     Navigator.pushNamed(context, '/checkIdentity');
-                    /*
-                    if (isEmailValid(email)) {
-                      // 이메일이 유효하면 '/checkIdentity' 경로로 이동
-                      Navigator.pushNamed(context, '/checkIdentity');
-                    } else {
-                      // 유효하지 않을 경우 에러 메시지 표시
-                      setState(() {
-                        emailError = "This email does not exist.";
-                      });
-                    }
-                    */
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
@@ -84,13 +102,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Next',
+                    '다음',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20), // 하단 여백 추가
+          ],
         ),
       ),
     );
