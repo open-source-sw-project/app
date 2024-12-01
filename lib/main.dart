@@ -9,6 +9,7 @@ import 'screen/camera_screen.dart';
 import 'screen/forgot_password.dart';
 import 'screen/check_name_number.dart';
 import 'screen/reset_password_screen.dart';
+import 'screen/diagnosis.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/forgotPassword': (context) => const ForgotPasswordScreen(),
         '/checkIdentity': (context) => const CheckNameNumber(),
         '/resetPassword': (context) => const ResetPasswordScreen(),
+        '/diagnosis' : (context) => const DiagnosisScreen(),
       },
     );
   }
