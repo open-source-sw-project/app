@@ -40,13 +40,23 @@ class ProfileScreen extends StatelessWidget {
               },
             ),
             const Divider(),
-            // Logout 버튼
+            // 개인 정보 수정 버튼
             ListTile(
               leading: const Icon(Icons.person_outline, color: Colors.blueAccent),
               title: const Text('내 정보 수정'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 Navigator.pushNamed(context, '/modify_profile');
+              },
+            ),
+            const Divider(),
+            // 임시 결과창
+            ListTile(
+              leading: const Icon(Icons.article, color: Colors.blueAccent),
+              title: const Text('결과창'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.pushNamed(context, '/result');
               },
             ),
             const Divider(),

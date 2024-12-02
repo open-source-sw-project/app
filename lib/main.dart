@@ -11,6 +11,7 @@ import 'screen/check_name_number.dart';
 import 'screen/reset_password_screen.dart';
 import 'screen/diagnosis.dart';
 import 'screen/modify_profile.dart';
+import 'screen/result.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/resetPassword': (context) => const ResetPasswordScreen(),
         '/diagnosis' : (context) => const DiagnosisScreen(),
         '/modify_profile': (context) => const ModifyProfileScreen(),
+        '/result': (context) => const ResultScreen(),
       },
     );
   }
