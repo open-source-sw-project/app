@@ -45,9 +45,9 @@ class ProfileScreen extends StatelessWidget {
               leading: const Icon(Icons.person_outline, color: Colors.blueAccent),
               title: const Text('내 정보 수정'),
               trailing: const Icon(Icons.arrow_forward_ios),
-              /*onTap: () {
-
-              },*/
+              onTap: () {
+                Navigator.pushNamed(context, '/modify_profile');
+              },
             ),
             const Divider(),
             // Logout 버튼
