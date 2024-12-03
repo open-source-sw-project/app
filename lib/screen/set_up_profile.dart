@@ -1,7 +1,155 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class SetUpProfileScreen extends StatelessWidget {
+class SetUpProfileScreen extends StatefulWidget {
   const SetUpProfileScreen({super.key});
+
+  @override
+  State<SetUpProfileScreen> createState() => _SetUpProfileScreenState();
+}
+
+class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _mobileController = TextEditingController();
+  DateTime? _selectedDate;
+  bool _isLoading = false;
+  File? _imageFile;
+  String? _profileImageUrl;
+  final _picker = ImagePicker();
+  
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 500,
+        maxHeight: 500,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<String?> _uploadImage() async {
+    if (_imageFile == null) return null;
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return null;
+
+      //프로필 사진 저장
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child('${user.uid}.jpg');
+
+      await ref.putFile(_imageFile!);
+
+      return await ref.getDownloadURL();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error uploading image: ${e.toString()}')),
+      );
+      return null;
+    }
+  }
+
+  // 프로필 사진 선택
+  void _showImagePicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+ //프로필 저장
+  Future<void> _saveProfile() async {
+    if (_firstNameController.text.isEmpty || 
+        _lastNameController.text.isEmpty || 
+        _mobileController.text.isEmpty ||
+        _selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // 프로필 사진 업로드
+        String? imageUrl;
+        if (_imageFile != null) {
+          imageUrl = await _uploadImage();
+        }
+
+        // 유저 정보 업데이트
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({
+          'firstName': _firstNameController.text,
+          'lastName': _lastNameController.text,
+          'mobile': _mobileController.text,
+          'dateOfBirth': _selectedDate?.toIso8601String(),
+          if (imageUrl != null) 'profileImageUrl': imageUrl,
+        });
+
+        if (mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            '/login',
+            (route) => false,
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +166,7 @@ class SetUpProfileScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context); // 이전 화면으로 이동
+            Navigator.pop(context);
           },
         ),
       ),
@@ -29,14 +177,15 @@ class SetUpProfileScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // Profile Picture
                 Center(
                   child: Stack(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 50,
-                        backgroundImage: NetworkImage(
-                            'https://via.placeholder.com/150'), // 기본 이미지
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: _imageFile != null 
+                          ? FileImage(_imageFile!) as ImageProvider
+                          : const NetworkImage('https://via.placeholder.com/150'),
                       ),
                       Positioned(
                         bottom: 0,
@@ -50,9 +199,7 @@ class SetUpProfileScreen extends StatelessWidget {
                               size: 16,
                               color: Colors.white,
                             ),
-                            onPressed: () {
-                              // 프로필 사진 수정 로직
-                            },
+                            onPressed: _showImagePicker,
                           ),
                         ),
                       ),
@@ -65,8 +212,9 @@ class SetUpProfileScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 30),
-                // First Name
+                // Rest of the form fields remain the same
                 TextField(
+                  controller: _firstNameController,
                   decoration: InputDecoration(
                     labelText: '이름',
                     border: OutlineInputBorder(
@@ -78,8 +226,8 @@ class SetUpProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Last Name
                 TextField(
+                  controller: _lastNameController,
                   decoration: InputDecoration(
                     labelText: '성',
                     border: OutlineInputBorder(
@@ -91,8 +239,8 @@ class SetUpProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Mobile Number
                 TextField(
+                  controller: _mobileController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     labelText: '전화번호',
@@ -105,7 +253,6 @@ class SetUpProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Date of Birth
                 TextField(
                   decoration: InputDecoration(
                     labelText: '생년월일',
@@ -117,21 +264,26 @@ class SetUpProfileScreen extends StatelessWidget {
                         color: Colors.blueAccent),
                   ),
                   readOnly: true,
+                  controller: TextEditingController(
+                    text: _selectedDate != null
+                        ? "${_selectedDate!.year}-${_selectedDate!.month}-${_selectedDate!.day}"
+                        : "",
+                  ),
                   onTap: () async {
-                    // Date Picker 로직
-                    DateTime? pickedDate = await showDatePicker(
+                    final pickedDate = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now(),
                       firstDate: DateTime(1900),
                       lastDate: DateTime.now(),
                     );
                     if (pickedDate != null) {
-                      // 선택된 날짜 처리
+                      setState(() {
+                        _selectedDate = pickedDate;
+                      });
                     }
                   },
                 ),
                 const SizedBox(height: 30),
-                // Sign Up Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -152,11 +304,20 @@ class SetUpProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _mobileController.dispose();
+    super.dispose();
   }
 }

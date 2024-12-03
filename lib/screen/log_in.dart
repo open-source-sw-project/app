@@ -1,7 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class LogInScreen extends StatelessWidget {
+class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
+
+  @override
+  State<LogInScreen> createState() => _LogInScreenState();
+}
+
+class _LogInScreenState extends State<LogInScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+
+  Future<void> _signIn() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Firebase로 로그인
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      // 로그인 시간 업데이트
+      await _firestore.collection('users').doc(userCredential.user!.uid).update({
+        'lastLogin': FieldValue.serverTimestamp(),
+      });
+
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'No user found for that email.';
+          break;
+        case 'wrong-password':
+          message = 'Wrong password provided.';
+          break;
+        case 'invalid-email':
+          message = 'The email address is badly formatted.';
+          break;
+        case 'user-disabled':
+          message = 'This user account has been disabled.';
+          break;
+        default:
+          message = 'An error occurred. Please try again.';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +84,6 @@ class LogInScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 30),
-              // App Logo and Title
               const Center(
                 child: Text(
                   'HanDoc.',
@@ -27,7 +96,6 @@ class LogInScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // Welcome Back Text
               Center(
                     child: Column(
                     children: [
@@ -52,21 +120,21 @@ class LogInScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-              // Email TextField
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email ID',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blueAccent),
                   ),
-                  prefixIcon: const Icon(Icons.email_outlined,
-                      color: Colors.blueAccent),
+                  prefixIcon: const Icon(Icons.email_outlined, color: Colors.blueAccent),
                 ),
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
-              // Password TextField
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -74,18 +142,29 @@ class LogInScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blueAccent),
                   ),
-                  prefixIcon:
-                      const Icon(Icons.lock_outline, color: Colors.blueAccent),
+                  prefixIcon: const Icon(Icons.lock_outline, color: Colors.blueAccent),
                 ),
               ),
               const SizedBox(height: 10),
-              // Forgot Password
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    // Handle Forgot Password
-                    Navigator.pushNamed(context, '/forgotPassword');
+                    // 비밀번호 재설정 기능
+                    if (_emailController.text.isNotEmpty) {
+                      _auth.sendPasswordResetEmail(email: _emailController.text);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Password reset email sent. Please check your inbox.'),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please enter your email address first.'),
+                        ),
+                      );
+                    }
                   },
                   child: const Text(
                     'Forgot Password',
@@ -119,18 +198,16 @@ class LogInScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              // Sign Up Option
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Don’t have an account? ",
+                      "Don't have an account? ",
                       style: TextStyle(color: Colors.grey),
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Handle Sign Up
                         Navigator.pushNamed(context, '/signUp');
                       },
                       child: const Text(
@@ -150,5 +227,12 @@ class LogInScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
