@@ -132,3 +132,62 @@ main(최종 릴리스 브랜치)
 
   ㄴ jins(팀원별 작업 브랜치)
      
+--------------------------------------------------------------------------------------------------
+
+
+## 데이터 구조
+users/
+  {userId}/
+    firstName: string
+    lastName: string
+    email: string
+    mobile: string
+    dateOfBirth: timestamp
+    profileImageUrl: string
+    lastLogin: timestamp
+    
+    diagnoses/
+      {diagnosisId}/
+        imageUrl: string
+        timestamp: timestamp
+        melanoma_probability: string
+        risk_level: string ("고위험" | "저위험")
+        assessment: string
+        notice: array<string>
+
+## 진단기록 불러오기 
+StreamBuilder<QuerySnapshot>(
+  stream: FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser?.uid)
+      .collection('diagnoses')
+      .orderBy('timestamp', descending: true)
+      .snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.hasData) {
+      return ListView.builder(
+        itemCount: snapshot.data!.docs.length,
+        itemBuilder: (context, index) {
+          final data = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+          return ListTile(
+            title: Text(data['risk_level']),
+            subtitle: Text(data['melanoma_probability']),
+          );
+        },
+      );
+    }
+    return const CircularProgressIndicator();
+  },
+)
+
+## 이미지 업로드
+Future<String> uploadImage(File image, String userId) async {
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child('diagnoses')
+      .child(userId)
+      .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+  await ref.putFile(image);
+  return await ref.getDownloadURL();
+}

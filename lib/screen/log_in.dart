@@ -1,3 +1,5 @@
+// lib/screens/log_in.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,7 +21,7 @@ class _LogInScreenState extends State<LogInScreen> {
   Future<void> _signIn() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
+        const SnackBar(content: Text('모든 필드를 입력해주세요')),
       );
       return;
     }
@@ -27,7 +29,6 @@ class _LogInScreenState extends State<LogInScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Firebase로 로그인
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
@@ -35,37 +36,42 @@ class _LogInScreenState extends State<LogInScreen> {
 
       if (!mounted) return;
 
-      // 로그인 시간 업데이트
       await _firestore.collection('users').doc(userCredential.user!.uid).update({
         'lastLogin': FieldValue.serverTimestamp(),
       });
 
-      Navigator.pushReplacementNamed(context, '/home');
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } on FirebaseAuthException catch (e) {
       String message;
       switch (e.code) {
         case 'user-not-found':
-          message = 'No user found for that email.';
+          message = '해당 이메일로 등록된 사용자가 없습니다.';
           break;
         case 'wrong-password':
-          message = 'Wrong password provided.';
+          message = '잘못된 비밀번호입니다.';
           break;
         case 'invalid-email':
-          message = 'The email address is badly formatted.';
+          message = '올바르지 않은 이메일 형식입니다.';
           break;
         case 'user-disabled':
-          message = 'This user account has been disabled.';
+          message = '비활성화된 계정입니다.';
           break;
         default:
-          message = 'An error occurred. Please try again.';
+          message = '로그인 중 오류가 발생했습니다.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('오류: ${e.toString()}')),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -97,8 +103,8 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
               const SizedBox(height: 20),
               Center(
-                    child: Column(
-                    children: [
+                child: Column(
+                  children: [
                     const Text(
                       'Welcome back',
                       style: TextStyle(
@@ -150,18 +156,17 @@ class _LogInScreenState extends State<LogInScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    // 비밀번호 재설정 기능
                     if (_emailController.text.isNotEmpty) {
                       _auth.sendPasswordResetEmail(email: _emailController.text);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Password reset email sent. Please check your inbox.'),
+                          content: Text('비밀번호 재설정 이메일이 전송되었습니다.'),
                         ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Please enter your email address first.'),
+                          content: Text('이메일 주소를 먼저 입력해주세요.'),
                         ),
                       );
                     }
@@ -173,28 +178,30 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              // Sign In Button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Handle Sign In
-                      Navigator.pushNamed(context, '/home');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      '로그인',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _signIn,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          '로그인',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                 ),
               ),
               const Spacer(),
