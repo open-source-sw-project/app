@@ -196,6 +196,14 @@ Future<String> uploadImage(File image, String userId) async {
 ---------------------------------------------------------------------------------------
 
 ## 실행방법
+
+### 서버실행(로컬작동시)
+services 폴더에 mealanoma_service.dart에서
+ baseUrl = 'http://192.168.0.9:5000/'; // Flask 서버 URL로 변경
+ 플라스크 서버실행후 나오는 ip로 변경해주면됨
+
+
+### 앱실행
 1. flutter clean
 2. flutter pub get
 3. flutter run
