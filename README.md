@@ -135,7 +135,7 @@ main(최종 릴리스 브랜치)
 --------------------------------------------------------------------------------------------------
 
 
-## 데이터 구조
+### 데이터 구조
 users/
   {userId}/
     firstName: string
@@ -155,7 +155,7 @@ users/
         assessment: string
         notice: array<string>
 
-## 진단기록 불러오기 
+### 진단기록 불러오기 
 StreamBuilder<QuerySnapshot>(
   stream: FirebaseFirestore.instance
       .collection('users')
@@ -180,7 +180,7 @@ StreamBuilder<QuerySnapshot>(
   },
 )
 
-## 이미지 업로드
+### 이미지 업로드
 Future<String> uploadImage(File image, String userId) async {
   final ref = FirebaseStorage.instance
       .ref()
@@ -191,3 +191,11 @@ Future<String> uploadImage(File image, String userId) async {
   await ref.putFile(image);
   return await ref.getDownloadURL();
 }
+
+
+---------------------------------------------------------------------------------------
+
+## 실행방법
+1. flutter clean
+2. flutter pub get
+3. flutter run
