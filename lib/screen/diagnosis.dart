@@ -1,8 +1,11 @@
+// lib/screens/diagnosis.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
+import '../services/melanoma_service.dart';
 
 class DiagnosisScreen extends StatefulWidget {
   const DiagnosisScreen({super.key});
@@ -23,7 +26,10 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
         throw Exception('User not logged in');
       }
 
-      // 1. 파이어베이스 스토리지에 이미지 업로드
+      // 1. Flask 서버로 이미지 전송 및 분석
+      final analysisResult = await MelanomaService.analyzeMelanoma(imageFile);
+
+      // 2. Firebase Storage에 이미지 업로드
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('diagnoses')
@@ -33,7 +39,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       await storageRef.putFile(imageFile);
       final imageUrl = await storageRef.getDownloadURL();
 
-      // 2. 파이어스토어에 이미지 URL과 정보 저장
+      // 3. Firestore에 분석 결과와 이미지 URL 저장
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -41,11 +47,15 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           .add({
         'imageUrl': imageUrl,
         'timestamp': FieldValue.serverTimestamp(),
+        'melanoma_probability': analysisResult['melanoma_probability'],
+        'risk_level': analysisResult['risk_level'],
+        'assessment': analysisResult['assessment'],
+        'notice': analysisResult['notice'],
       });
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Diagnosis submitted successfully')),
+          const SnackBar(content: Text('진단이 완료되었습니다')),
         );
         Navigator.pushReplacementNamed(context, '/home');
       }
