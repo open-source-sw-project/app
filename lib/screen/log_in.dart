@@ -97,8 +97,8 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
               const SizedBox(height: 20),
               Center(
-                child: Column(
-                  children: [
+                    child: Column(
+                    children: [
                     const Text(
                       'Welcome back',
                       style: TextStyle(
@@ -109,7 +109,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Please enter your email id or password\nto Sign In',
+                      '로그인에 필요한 아이디와 비밀번호를 입력하세요\n',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -172,24 +172,29 @@ class _LogInScreenState extends State<LogInScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _signIn,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 10),
+              // Sign In Button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle Sign In
+                      Navigator.pushNamed(context, '/home');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      '로그인',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          'Sign In',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
                 ),
               ),
               const Spacer(),

@@ -1,44 +1,134 @@
+## Workflow
+### 1. 작업 브랜치 전환
++ 각자 자신의 브랜치에서 작업을 시작합니다. 예를 들어, joon 브랜치에서 작업하려면:
 
-## Firebase 추가됨
 
-현재 firebase에서 사용하는 기능은 3가지로 auth, firestore, storage가 있음
+### 2. 작업 내용 커밋
++ 수정한 파일을 추가하고 커밋합니다.
 
-auth는 회원가입에대해 당담함 여러가지의 회원가입형태를 지원하는데 현재는 이메일 인증이 필요없는 이메일방식
-firestore는 데이터베이스로 NoSql방식을 사용하고있음 사용자 정보나 이미지url같은 텍스트로 정의되는 정보를 저장함
-storage는 이미지나 비디오같은 용량이크고 텍스트로 저장할수없는 파일을 저장함 firestore에서 이미지url정보를 이용해 해당 이미지를 불러올수있음
+  $ git add .
 
------------------------------------------------------------------------------------------------------------------------------------------------
+  $ git commit -m "Describe your changes"
 
-sign_up.dart, set_up_profile.dart   -->    회원가입기능 추가됨
 
-아이디, 비밀번호, 생년월일, 생성시간, 이름과 성, 전화번호, 프로필이미지 storage경로, 마지막로그인시간
+### 3. 로컬 작업 내용 푸시
++ 로컬 브랜치의 작업 내용을 원격 저장소에 푸시합니다.
 
-비밀번호는 보안정책때문에 프로젝트 관리자도 사용자의 비밀번호는 알수없음
+  $ git push origin joon
 
-예시)
-createdAt   :   2024년 11월 26일 오전 9시 28분 11초 UTC+9
 
-dateOfBirth :   "2024-11-01T00:00:00.000"
+### 4. develop 브랜치로 병합
++ 작업이 완료되면 develop 브랜치로 병합합니다
 
-email   :   "a@a.com"
+  $ git checkout develop
 
-firstName   :   "as"
+  $ git pull origin develop  # 최신 상태로 업데이트
 
-lastLogin   :   2024년 11월 26일 오전 9시 28분 43초 UTC+9
+  $ git merge joon
 
-lastName    :   "qwer"
+  $ git push origin develop
 
-mobile  :   "123454124324"
+---
+## 팀원 간 협업
+### 1. develop에서 변경사항 가져오기
++ 다른 팀원의 작업 내용을 반영하기 위해 develop 브랜치에서 최신 내용을 병합합니다.
 
-profileImageUrl :   "https://firebasestorage.googleapis.com/v0/b/opensw-c2e3a.firebasestorage.app/o/profile_images%2FPawvZioJLwUTguq5M7Jcf7u0u8j2.jpg?alt=media&token=ab2ad670-9181-4497-80b5-13e2c5af20b2"
+  $ git checkout develop
 
-------------------------------------------------------------------------------------------------------------------------------------------------
+  $ git pull origin develop
 
-diagonosis.dart  -->  진단데이터 저장하는 기능
 
-이미지url, 생성날짜 
+### 2. 작업 브랜치에 반영
++ develop 브랜치의 변경사항을 자신의 브랜치에 반영합니다.
 
-예시)
-imageUrl    :   "https://firebasestorage.googleapis.com/v0/b/opensw-c2e3a.firebasestorage.app/o/diagnoses%2FPawvZioJLwUTguq5M7Jcf7u0u8j2%2F1732580926811.jpg?alt=media&token=2d520a48-7e46-4530-b738-1c607c072b6c"
+  $ git checkout joon
 
-timestamp   :   2024년 11월 26일 오전 9시 28분 52초 UTC+9
+  $ git merge develop
+
+---
+## 최종 릴리스
+### 1. main으로 병합
++ develop 브랜치에서 릴리스 준비가 완료되면 main 브랜치로 병합합니다.
+
+  $ git checkout main
+
+  $ git pull origin main  # 최신 상태로 업데이트
+
+  $ git merge develop
+
+  $ git push origin main
+
+
+### 2. 릴리스 태그 추가
++ 릴리스 버전을 태그로 표시합니다.
+
+  $ git tag -a v1.0.0 -m "Release version 1.0.0"
+
+  $ git push origin v1.0.0
+
+
+---
+### 브랜치 네이밍 규칙
+   main: 최종 릴리스 브랜치.
+   ㄴ develop: 통합 개발 브랜치.
+     ㄴ joon: 팀원별 작업 브랜치.
+     ㄴ bell: 팀원별 작업 브랜치.
+     ㄴ jins: 팀원별 작업 브랜치.
+
+
+### 협업 규칙
++ Pull Request(PR) 생성: 각 브랜치에서 작업 후 develop으로 병합할 때 PR을 생성합니다.
++ 리뷰어가 코드를 확인하고 승인한 후 병합합니다.
+
+
+### Commit Message 규칙:
++ 작업 내용을 명확히 설명합니다.
+    예: Add login validation logic.
+
+
+### 정기 병합:
++ 팀원 간 충돌을 줄이기 위해 매일 정해진 시간에 develop 브랜치와 자신의 브랜치를 동기화합니다.
+
+---
+## 참고 명령어
+### 현재 브랜치 확인:
+  $ git branch
+
+
+### 원격 브랜치 목록 확인:
+  $ git branch -r
+
+
+### 브랜치 삭제 (병합 후):
+  $ git branch -d <branch_name>
+
+  $ git push origin --delete <branch_name>
+=======
+---
+## Git Workflow Strategy
++ Branch Overview
++ 우리 프로젝트는 다음과 같은 브랜치 구조를 사용합니다:
+
+
+### main:
++ 최종 릴리스 버전이 저장되는 브랜치입니다. 직접 작업하지 않습니다.
+
+
+### develop:
++ 모든 개발 작업이 병합되는 기본 브랜치입니다. joon, bell, jins 브랜치에서 작업이 완료되면 이 브랜치로 병합합니다.
+
+### joon, bell, jins:
++ 각자 작업하는 브랜치입니다. 이름은 팀원별로 구분됩니다. 작업이 완료되면 develop 브랜치로 병합합니다.
++ 
+---
+### 브랜치 네이밍 규칙
+main(최종 릴리스 브랜치)
+
+ㄴ develop(통합 개발 브랜치)
+  
+  ㅏ joon(팀원별 작업 브랜치)
+  
+  ㅏ bell(팀원별 작업 브랜치)
+
+  ㄴ jins(팀원별 작업 브랜치)
+     

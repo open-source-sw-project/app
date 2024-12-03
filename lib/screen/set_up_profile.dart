@@ -159,7 +159,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
         backgroundColor: Colors.blueAccent,
         elevation: 0,
         title: const Text(
-          'Set Up Profile',
+          '개인정보 설정',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -208,7 +208,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Profile Picture',
+                  '프로필 사진',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 30),
@@ -216,7 +216,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                 TextField(
                   controller: _firstNameController,
                   decoration: InputDecoration(
-                    labelText: 'First Name',
+                    labelText: '이름',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -229,7 +229,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                 TextField(
                   controller: _lastNameController,
                   decoration: InputDecoration(
-                    labelText: 'Last Name',
+                    labelText: '성',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -243,7 +243,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                   controller: _mobileController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: 'Mobile Number',
+                    labelText: '전화번호',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -255,7 +255,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                 const SizedBox(height: 20),
                 TextField(
                   decoration: InputDecoration(
-                    labelText: 'Date of Birth',
+                    labelText: '생년월일',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.blueAccent),
@@ -288,19 +288,20 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveProfile,
+                    onPressed: () {
+                      // Handle Sign Up Completion
+                      Navigator.pushNamed(context, '/login');
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Sign Up',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
+                    child: const Text(
+                      '가입하기',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
