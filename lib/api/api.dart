@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 class Api {
-  static const String baseUrl = 'http://172.29.58.176:5000/'; // 서버 URL
+  static const String baseUrl = 'http://192.168.149.186:5000/'; // 서버 URL
   // Firebase 연결 등 추가 설정이 여기 포함될 수 있음.
 
   static Future<http.Response> post(String endpoint, dynamic body) async {

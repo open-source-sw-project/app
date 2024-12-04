@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart'; // 반원 그래프용 패키지
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart'; // 날짜 형식 변경
 import '../api/firebase_api.dart'; // Firebase API import
 
 class ProfileScreen extends StatefulWidget {
@@ -12,8 +14,26 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String userName = 'Loading...';
   bool _isLoading = true;
-
   final FirebaseApi _apiService = FirebaseApi();
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
+  List<Map<String, dynamic>> _diagnoses = []; // 선택된 날짜의 진단 데이터를 저장
+  DateTime? _selectedDate; // 선택된 날짜
+  int _currentIndex = 2; // Profile 탭 기본 활성화
+
+  void _onTabTapped(int index) {
+    if (index == 0) {
+      // Home 화면으로 이동
+      Navigator.pushNamed(context, '/home');
+    } else if (index == 1) {
+      // Diagnosis 화면으로 이동
+      Navigator.pushNamed(context, '/camera');
+    } else if (index == 2) {
+      // Profile 화면 현재 유지
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -37,6 +57,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<List<DateTime>> _fetchAvailableDates() async {
+    try {
+      final dates = await _apiService.fetchAvailableDates(uid);
+      dates.sort(); // 날짜 정렬
+      return dates;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching dates: $e')),
+      );
+      return [];
+    }
+  }
+
+  Future<void> _selectDateFromAvailable(BuildContext context) async {
+    final availableDates = await _fetchAvailableDates();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Diagnosis Date'),
+          content: SizedBox(
+            height: 300,
+            child: ListView.builder(
+              itemCount: availableDates.length,
+              itemBuilder: (context, index) {
+                final date = availableDates[index];
+                return ListTile(
+                  title: Text(DateFormat('yyyy-MM-dd').format(date)),
+                  onTap: () {
+                    Navigator.pop(context, date); // 선택한 날짜 반환
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).then((selectedDate) {
+      if (selectedDate != null) {
+        setState(() {
+          _selectedDate = selectedDate;
+        });
+        _fetchDiagnosesForSelectedDate();
+      }
+    });
+  }
+
+  Future<void> _fetchDiagnosesForSelectedDate() async {
+    if (_selectedDate == null) return;
+    try {
+      final data = await _apiService.fetchDiagnosesForDate(uid, _selectedDate!);
+      setState(() {
+        _diagnoses = data;
+      });
+      _showLogsDialog(context); // 데이터를 가져온 후 팝업 표시
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching diagnoses: $e')),
+      );
     }
   }
 
@@ -70,12 +152,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 40),
             // My previous log 버튼
             ListTile(
-              leading:
-              const Icon(Icons.article, color: Colors.blueAccent),
-              title: const Text('최근 기록'),
+              leading: const Icon(Icons.article,
+                  color: Colors.blueAccent),
+              title: const Text('과거 기록'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                _showLogsDialog(context); // 팝업 표시
+                _selectDateFromAvailable(context); // 날짜 선택 창 열기
               },
             ),
             const Divider(),
@@ -92,7 +174,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const Divider(),
             // Logout 버튼
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              leading:
+              const Icon(Icons.logout, color: Colors.redAccent),
               title: const Text('로그아웃'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
@@ -101,6 +184,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.camera),
+            label: 'Diagnosis',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.grey,
       ),
     );
   }
@@ -111,47 +214,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('최근 기록'),
+          title: Text(
+              'Records for ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}'),
           content: SizedBox(
             height: 400,
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: _apiService.fetchDiagnoses(), // FirebaseApi의 fetchDiagnoses 호출
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                      child: CircularProgressIndicator()); // 로딩 표시
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'), // 에러 메시지
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No diagnoses available'));
-                } else {
-                  // 데이터가 있을 경우 리스트 표시
-                  return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      final diagnosis = snapshot.data![index];
-                      final String probabilityString =
-                      diagnosis['melanoma_probability'];
-                      final double probability = double.parse(
-                          probabilityString.replaceAll('%', '').trim()); // 변환
+            child: _diagnoses.isEmpty
+                ? const Center(child: Text('No diagnoses available'))
+                : ListView.builder(
+              itemCount: _diagnoses.length,
+              itemBuilder: (context, index) {
+                final diagnosis = _diagnoses[index];
+                final String probabilityString =
+                diagnosis['melanoma_probability'];
+                final double probability = double.parse(
+                    probabilityString.replaceAll('%', '').trim());
+                final imageUrl = diagnosis['imageUrl'];
 
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                          NetworkImage(diagnosis['imageUrl']), // 이미지 표시
-                        ),
-                        title: Text(
-                          'Melanoma Probability: ${probability.toStringAsFixed(1)}%',
-                        ),
-                        onTap: () {
-                          _showProbabilityGraph(context, probability);
-                        },
-                      );
-                    },
-                  );
-                }
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(imageUrl),
+                  ),
+                  title: Text(
+                    'Melanoma Probability: ${probability.toStringAsFixed(1)}%',
+                  ),
+                  onTap: () {
+                    _showProbabilityGraph(context, probability);
+                  },
+                );
               },
             ),
           ),

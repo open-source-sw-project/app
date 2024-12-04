@@ -21,7 +21,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
   File? _imageFile;
   String? _profileImageUrl;
   final _picker = ImagePicker();
-  
+
   Future<void> _pickImage(ImageSource source) async {
     try {
       final pickedFile = await _picker.pickImage(
@@ -99,8 +99,8 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
   }
  //프로필 저장
   Future<void> _saveProfile() async {
-    if (_firstNameController.text.isEmpty || 
-        _lastNameController.text.isEmpty || 
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
         _mobileController.text.isEmpty ||
         _selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -134,7 +134,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
 
         if (mounted) {
           Navigator.pushNamedAndRemoveUntil(
-            context, 
+            context,
             '/login',
             (route) => false,
           );
@@ -183,7 +183,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: Colors.grey[200],
-                        backgroundImage: _imageFile != null 
+                        backgroundImage: _imageFile != null
                           ? FileImage(_imageFile!) as ImageProvider
                           : const NetworkImage('https://via.placeholder.com/150'),
                       ),

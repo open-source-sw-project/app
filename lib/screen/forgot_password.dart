@@ -30,7 +30,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       // Firestore에서 이메일 검색
       final querySnapshot = await _firestore
-          .collection('users') // Firestore의 users 컬렉션
+          .collection('users')
           .where('email', isEqualTo: email)
           .get();
 
@@ -45,8 +45,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         });
       }
     } catch (e) {
+      print('Firestore Error: $e'); // 에러 상세 정보 출력
       setState(() {
-        emailError = '오류가 발생했습니다. 다시 시도해주세요.';
+        emailError = '오류가 발생했습니다: $e';
       });
     } finally {
       setState(() {

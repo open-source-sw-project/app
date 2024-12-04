@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CheckNameNumber extends StatefulWidget {
   final String email; // 이전 화면에서 전달받은 이메일
@@ -17,6 +18,7 @@ class _CheckNameNumberState extends State<CheckNameNumber> {
   bool _isLoading = false;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Firestore에서 이름과 전화번호 확인
   Future<void> checkDetails(String name, String phone) async {
@@ -36,12 +38,21 @@ class _CheckNameNumberState extends State<CheckNameNumber> {
         final userData = querySnapshot.docs.first.data();
 
         // 이름과 전화번호 확인 (대소문자 구분 없이 처리)
-        final fullName = '${userData['Last Name']}${userData['First Name']}';
+        final fullName = '${userData['lastName']}${userData['firstName']}';
         if (fullName.toLowerCase().trim() == name.toLowerCase().trim() &&
-            userData['Mobile'] == phone.trim()) {
-          // 일치할 경우 다음 화면으로 이동
+            userData['mobile'] == phone.trim()) {
+          // 일치할 경우 비밀번호 재설정 이메일 전송
+          await _auth.sendPasswordResetEmail(email: widget.email);
+
           if (!mounted) return;
-          Navigator.pushNamed(context, '/resetPassword', arguments: widget.email);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('비밀번호 재설정 이메일이 전송되었습니다.'),
+            ),
+          );
+
+          // 로그인 화면으로 이동
+          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
         } else {
           // 이름 또는 전화번호가 일치하지 않을 경우
           setState(() {

@@ -10,7 +10,6 @@ import 'screen/profile.dart';
 import 'screen/camera_screen.dart';
 import 'screen/forgot_password.dart';
 import 'screen/check_name_number.dart';
-import 'screen/reset_password_screen.dart';
 import 'screen/diagnosis.dart';
 import 'screen/modify_profile.dart';
 import 'screen/result.dart';
@@ -50,11 +49,6 @@ class MyApp extends StatelessWidget {
           final email = settings.arguments as String;
           return MaterialPageRoute(
             builder: (context) => CheckNameNumber(email: email),
-          );
-        }
-        else if(settings.name == '/resetPassword'){
-          final email = settings.arguments as String;
-          return MaterialPageRoute(builder: (context) => ResetPasswordScreen(email: email),
           );
         }
         return null; // 다른 경로는 기본 routes로 처리

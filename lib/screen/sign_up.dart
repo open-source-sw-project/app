@@ -16,7 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
 
-  
+
   // 회원가입 로직
   Future<void> _signUp() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -42,6 +42,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
       // 회원가입 성공 시 프로필 설정 화면으로 이동
       if (mounted) {
+        setState(() => _isLoading = false);
         Navigator.pushNamed(context, '/setUpProfile');
       }
     } on FirebaseAuthException catch (e) {
@@ -59,8 +60,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true, // 키보드가 올라오면 화면 조정
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView( // 추가: 스크롤 가능
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,9 +143,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
-                          'Next',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
+                    'Next',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -152,6 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+
 
   @override
   void dispose() {

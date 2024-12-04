@@ -1,5 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+
+DateTime parseCustomDate(String dateString) {
+  final format = DateFormat("yyyy년 MM월 dd일 HH시 mm분");
+  return format.parse(dateString);
+}
 
 class FirebaseApi {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -86,15 +92,69 @@ class FirebaseApi {
 
   //-------------------- diagnosis 관련 -----------------
 
-  // diagnoses 컬렉션에서 데이터 가져오기
-  Future<List<Map<String, dynamic>>> fetchDiagnoses() async {
+  Future<List<Map<String, dynamic>>> fetchDiagnosesForDate(
+      String uid, DateTime selectedDate) async {
     try {
-      final querySnapshot = await _firestore.collection('diagnoses').get();
-      return querySnapshot.docs.map((doc) => doc.data()).toList();
+      // 자정부터 다음 날 자정까지의 범위를 설정
+      final startOfDay = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+      final endOfDay = startOfDay.add(const Duration(days: 1));
+
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('diagnoses')
+          .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+          .where('timestamp', isLessThan: Timestamp.fromDate(endOfDay))
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
     } catch (e) {
-      throw Exception('Failed to fetch diagnoses: $e');
+      throw Exception('Failed to fetch diagnoses for selected date: $e');
     }
   }
+
+
+
+  Future<List<DateTime>> fetchAvailableDates(String uid) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('diagnoses')
+          .get();
+
+      // 날짜 추출 및 중복 제거
+      final dates = querySnapshot.docs.map((doc) {
+        final timestamp = doc['timestamp'];
+        if (timestamp is Timestamp) {
+          return DateTime(timestamp.toDate().year, timestamp.toDate().month,
+              timestamp.toDate().day); // 시간 제거
+        } else if (timestamp is String) {
+          final date = parseCustomDate(timestamp);
+          return DateTime(date.year, date.month, date.day); // 시간 제거
+        } else {
+          throw Exception('Invalid timestamp format');
+        }
+      }).toSet().toList(); // 중복 제거
+
+      dates.sort(); // 날짜 정렬
+      return dates;
+    } catch (e) {
+      throw Exception('Failed to fetch available dates: $e');
+    }
+  }
+
+  DateTime parseCustomDate(String dateString) {
+    final format = DateFormat("yyyy년 MM월 dd일 HH시 mm분");
+    return format.parse(dateString);
+  }
+
+
+
+
+
 
   // ------------------- Firestore 유틸리티 -------------------
 
