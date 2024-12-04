@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../api/firebase_api.dart'; // FirebaseApi 클래스 import
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -10,67 +10,69 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoading = false;
-  final _auth = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
+  final FirebaseApi _apiService = FirebaseApi(); // FirebaseApi 인스턴스 생성
+  bool _isLoading = false;
+
+  // 로그인 메서드
   Future<void> _signIn() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+      _showMessage('Please fill all fields.');
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      // Firebase로 로그인
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      // FirebaseApi의 loginUser 호출
+      final user = await _apiService.loginUser(
+        _emailController.text,
+        _passwordController.text,
       );
 
-      if (!mounted) return;
+      if (user != null) {
+        // 로그인 성공 시 Firestore의 lastLogin 필드 업데이트
+        await _apiService.updateLastLogin(user.uid);
 
-      // 로그인 시간 업데이트
-      await _firestore.collection('users').doc(userCredential.user!.uid).update({
-        'lastLogin': FieldValue.serverTimestamp(),
-      });
-
-      Navigator.pushReplacementNamed(context, '/home');
+        // 홈 화면으로 이동
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } on FirebaseAuthException catch (e) {
-      String message;
-      switch (e.code) {
-        case 'user-not-found':
-          message = 'No user found for that email.';
-          break;
-        case 'wrong-password':
-          message = 'Wrong password provided.';
-          break;
-        case 'invalid-email':
-          message = 'The email address is badly formatted.';
-          break;
-        case 'user-disabled':
-          message = 'This user account has been disabled.';
-          break;
-        default:
-          message = 'An error occurred. Please try again.';
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      _handleFirebaseAuthError(e);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      _showMessage('An unexpected error occurred: $e');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      setState(() => _isLoading = false);
     }
+  }
+
+  void _handleFirebaseAuthError(FirebaseAuthException e) {
+    String message;
+    switch (e.code) {
+      case 'user-not-found':
+        message = 'No user found with this email.';
+        break;
+      case 'wrong-password':
+        message = 'Invalid password.';
+        break;
+      case 'invalid-email':
+        message = 'Please enter a valid email address.';
+        break;
+      case 'user-disabled':
+        message = 'This account has been disabled.';
+        break;
+      default:
+        message = 'Login failed. Please try again.';
+    }
+    _showMessage(message);
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -97,8 +99,8 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
               const SizedBox(height: 20),
               Center(
-                    child: Column(
-                    children: [
+                child: Column(
+                  children: [
                     const Text(
                       'Welcome back',
                       style: TextStyle(
@@ -138,6 +140,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Password',
+                  hintText: 'Minimum 6 characters',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blueAccent),
@@ -150,21 +153,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    // 비밀번호 재설정 기능
-                    if (_emailController.text.isNotEmpty) {
-                      _auth.sendPasswordResetEmail(email: _emailController.text);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Password reset email sent. Please check your inbox.'),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please enter your email address first.'),
-                        ),
-                      );
-                    }
+                    Navigator.pushNamed(context, '/forgotPassword');
                   },
                   child: const Text(
                     'Forgot Password',
@@ -173,24 +162,22 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              // Sign In Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Handle Sign In
-                      Navigator.pushNamed(context, '/home');
-                    },
+                    onPressed: _isLoading ? null : _signIn,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
                       '로그인',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),

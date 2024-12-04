@@ -40,11 +40,24 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfileScreen(),
         '/camera': (context) => const CameraScreen(),
         '/forgotPassword': (context) => const ForgotPasswordScreen(),
-        '/checkIdentity': (context) => const CheckNameNumber(),
-        '/resetPassword': (context) => const ResetPasswordScreen(),
-        '/diagnosis' : (context) => const DiagnosisScreen(),
+        '/diagnosis': (context) => const DiagnosisScreen(),
         '/modify_profile': (context) => const ModifyProfileScreen(),
         '/result': (context) => const ResultScreen(),
+      },
+      onGenerateRoute: (settings) {
+        // 이메일 전달을 위해 onGenerateRoute 사용
+        if (settings.name == '/checkIdentity') {
+          final email = settings.arguments as String;
+          return MaterialPageRoute(
+            builder: (context) => CheckNameNumber(email: email),
+          );
+        }
+        else if(settings.name == '/resetPassword'){
+          final email = settings.arguments as String;
+          return MaterialPageRoute(builder: (context) => ResetPasswordScreen(email: email),
+          );
+        }
+        return null; // 다른 경로는 기본 routes로 처리
       },
     );
   }

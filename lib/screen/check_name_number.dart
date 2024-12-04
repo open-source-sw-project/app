@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CheckNameNumber extends StatefulWidget {
-  const CheckNameNumber({super.key});
+  final String email; // 이전 화면에서 전달받은 이메일
+
+  const CheckNameNumber({super.key, required this.email});
 
   @override
   State<CheckNameNumber> createState() => _CheckNameNumberState();
@@ -11,10 +14,55 @@ class _CheckNameNumberState extends State<CheckNameNumber> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   String? errorText;
+  bool _isLoading = false;
 
-  // 이름과 전화번호 검증 함수
-  bool isDetailsValid(String name, String phone) {
-    return name == "John Doe" && phone == "1234567890"; // 가짜 데이터
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Firestore에서 이름과 전화번호 확인
+  Future<void> checkDetails(String name, String phone) async {
+    setState(() {
+      _isLoading = true;
+      errorText = null; // 초기화
+    });
+
+    try {
+      // Firestore에서 이메일로 사용자 문서 조회
+      final querySnapshot = await _firestore
+          .collection('users') // Firestore의 users 컬렉션
+          .where('email', isEqualTo: widget.email) // 이메일 필드와 비교
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final userData = querySnapshot.docs.first.data();
+
+        // 이름과 전화번호 확인 (대소문자 구분 없이 처리)
+        final fullName = '${userData['Last Name']}${userData['First Name']}';
+        if (fullName.toLowerCase().trim() == name.toLowerCase().trim() &&
+            userData['Mobile'] == phone.trim()) {
+          // 일치할 경우 다음 화면으로 이동
+          if (!mounted) return;
+          Navigator.pushNamed(context, '/resetPassword', arguments: widget.email);
+        } else {
+          // 이름 또는 전화번호가 일치하지 않을 경우
+          setState(() {
+            errorText = '이름이나 전화번호가 올바르지 않습니다.';
+          });
+        }
+      } else {
+        // 이메일에 해당하는 사용자가 없을 경우
+        setState(() {
+          errorText = '사용자를 찾을 수 없습니다.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorText = '오류가 발생했습니다. 다시 시도해주세요.';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -43,35 +91,30 @@ class _CheckNameNumberState extends State<CheckNameNumber> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '사용자 인증',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          '이름과 전화번호를 입력하세요\n',
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
+                    const Text(
+                      '사용자 인증',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '이름과 전화번호를 입력하세요\n',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(
                         labelText: 'Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Colors.blueAccent),
                         ),
                         prefixIcon: const Icon(Icons.person_outline,
                             color: Colors.blueAccent),
@@ -84,19 +127,16 @@ class _CheckNameNumberState extends State<CheckNameNumber> {
                         labelText: 'Phone Number',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Colors.blueAccent),
                         ),
                         prefixIcon: const Icon(Icons.phone_outlined,
                             color: Colors.blueAccent),
                       ),
                     ),
+                    const SizedBox(height: 20),
                     if (errorText != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: Text(
-                          errorText!,
-                          style: const TextStyle(color: Colors.red),
-                        ),
+                      Text(
+                        errorText!,
+                        style: const TextStyle(color: Colors.red),
                       ),
                   ],
                 ),
@@ -108,21 +148,18 @@ class _CheckNameNumberState extends State<CheckNameNumber> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle Reset Password
-                    Navigator.pushNamed(context, '/resetPassword');
-                    /*
+                  onPressed: _isLoading
+                      ? null
+                      : () {
                     final name = nameController.text.trim();
                     final phone = phoneController.text.trim();
-                    if (isDetailsValid(name, phone)) {
-                      Navigator.pushNamed(context, '/resetPassword');
+                    if (name.isNotEmpty && phone.isNotEmpty) {
+                      checkDetails(name, phone);
                     } else {
                       setState(() {
-                        errorText = "이름이나 전화번호가 올바르지 않습니다.";
+                        errorText = '모든 필드를 입력하세요.';
                       });
                     }
-
-                     */
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
@@ -130,17 +167,26 @@ class _CheckNameNumberState extends State<CheckNameNumber> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
                     '다음',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20), // 하단 여백
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    super.dispose();
   }
 }
